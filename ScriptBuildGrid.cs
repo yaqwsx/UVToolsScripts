@@ -9,7 +9,7 @@ namespace UVtools.ScriptSample;
 
 public class ScriptBuildGrid : ScriptGlobals
 {
-    readonly ScriptNumericalInput<int> GridSpacing = new()
+    readonly ScriptNumericalInput<ushort> GridSpacing = new()
     {
         Label = "Size of the initial grains",
         Unit = "px",
@@ -19,7 +19,7 @@ public class ScriptBuildGrid : ScriptGlobals
         Value = 200,
     };
 
-    readonly ScriptNumericalInput<int> GridWidth = new()
+    readonly ScriptNumericalInput<ushort> GridWidth = new()
     {
         Label = "Width of line",
         Unit = "px",
@@ -52,7 +52,6 @@ public class ScriptBuildGrid : ScriptGlobals
         Script.UserInputs.Add(GridSpacing);
         Script.UserInputs.Add(GridWidth);
 
-        // sn4k3: May be useful?
         Script.UserInputs.Add(ExposureTime);
         ExposureTime.Value = SlicerFile.BottomExposureTime;
     }
@@ -66,12 +65,8 @@ public class ScriptBuildGrid : ScriptGlobals
         return null;
     }
 
-    private Mat GenerateGridPattern() {
-        // Jan
-        //var pattern = EmguExtensions.InitMat(SlicerFile.Resolution);
-        //var white = new MCvScalar(255, 255, 255); --> Use EmguExtensions.WhiteColor
-
-        // sn4k3: alias of what you had
+    private Mat GenerateGridPattern() 
+    {
         var pattern = SlicerFile.CreateMat();
 
         for (int x = pattern.Size.Width / 2; x < pattern.Size.Width; x += GridSpacing.Value) {
@@ -107,17 +102,6 @@ public class ScriptBuildGrid : ScriptGlobals
     {
         Progress.Reset("Changing layers", 2); // Sets the progress name and number of items to process
 
-        //Jan
-        /*var newLayers = new Layer[2];
-        var pattern = GenerateGridPattern(); --> Dont forget to dispose Mat's, 'using'
-
-        newLayers[0] = SlicerFile.Layers[0];
-        newLayers[0].LayerMat = pattern;
-
-        newLayers[1] = SlicerFile.Layers[1];
-        newLayers[1].LayerMat = pattern;*/
-
-        // sn4k3: Reallocate change layer array size and keep it old layers up to the new value
         SlicerFile.Reallocate(2);
         
         using var pattern = GenerateGridPattern();
