@@ -7,7 +7,7 @@ using Emgu.CV.CvEnum;
 
 namespace UVtools.ScriptSample;
 
-public class ScriptPreventResinShrinkage : ScriptGlobals
+public class ScriptBuildGrid : ScriptGlobals
 {
     readonly ScriptNumericalInput<int> GridSpacing = new()
     {
