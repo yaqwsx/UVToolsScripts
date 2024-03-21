@@ -158,7 +158,7 @@ public class ScriptPreventResinShrinkage : ScriptGlobals
             coresLayer2.LayerMat = coresMat2;
 
             // Try to disable lifts for last two subsequent layers
-            fullLayer.LiftHeightTotal = coresLayer2.LiftHeightTotal = SlicerFile.SupportsGCode ? 0f : 0.1f;
+            fullLayer.LiftHeightTotal = coresLayer2.LiftHeightTotal = SlicerFile.SupportGCode ? 0f : 0.1f;
 
             newLayers[layerIndex * 3] = coresLayer1;
             newLayers[layerIndex * 3 + 1] = coresLayer2;
@@ -167,10 +167,17 @@ public class ScriptPreventResinShrinkage : ScriptGlobals
             Progress.LockAndIncrement();
         });
 
-        // Remove null layers (Empty layers not replicated)
-        newLayers = newLayers.Where(layer => layer is not null).ToArray();
+        newLayers = SlicerFile
+            // Re-add start layers you are not modifying
+            .Take((int)Operation.LayerIndexStart)
+            // Remove null layers (Empty layers not replicated)
+            .Concat(newLayers.Where(layer => layer is not null))
+            // Re-add end layers you are not modifying
+            .Concat(SlicerFile.TakeLast((int)(SlicerFile.Count - (Operation.LayerIndexEnd + 1))))
+            .ToArray();
 
-        SlicerFile.SuppressRebuildPropertiesWork(() => {
+        SlicerFile.SuppressRebuildPropertiesWork(() =>
+        {
             SlicerFile.Layers = newLayers;
         });
         // return true if not cancelled by user
