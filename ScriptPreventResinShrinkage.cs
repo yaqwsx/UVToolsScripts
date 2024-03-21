@@ -167,10 +167,17 @@ public class ScriptPreventResinShrinkage : ScriptGlobals
             Progress.LockAndIncrement();
         });
 
-        // Remove null layers (Empty layers not replicated)
-        newLayers = newLayers.Where(layer => layer is not null).ToArray();
+        newLayers = SlicerFile
+            // Re-add start layers you are not modifying
+            .Take((int)Operation.LayerIndexStart)
+            // Remove null layers (Empty layers not replicated)
+            .Concat(newLayers.Where(layer => layer is not null))
+            // Re-add end layers you are not modifying
+            .Concat(SlicerFile.TakeLast((int)(SlicerFile.Count - (Operation.LayerIndexEnd + 1))))
+            .ToArray();
 
-        SlicerFile.SuppressRebuildPropertiesWork(() => {
+        SlicerFile.SuppressRebuildPropertiesWork(() =>
+        {
             SlicerFile.Layers = newLayers;
         });
         // return true if not cancelled by user
