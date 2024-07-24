@@ -52,7 +52,7 @@ public class ScriptPreventResinShrinkage : ScriptGlobals
     /// <returns>A error message, empty or null if validation passes.</returns>
     public string? ScriptValidate()
     {
-        return SlicerFile.CanUseLayerPositionZ ? null : "Your printer/file format is not supported: Unable to have multiple layers in same Z position.";
+        return SlicerFile.CanUseSameLayerPositionZ ? null : "Your printer/file format is not supported: Unable to have multiple layers in same Z position.";
     }
 
     private Mat GenerateDotPattern() {
@@ -158,7 +158,7 @@ public class ScriptPreventResinShrinkage : ScriptGlobals
             coresLayer2.LayerMat = coresMat2;
 
             // Try to disable lifts for last two subsequent layers
-            fullLayer.LiftHeightTotal = coresLayer2.LiftHeightTotal = SlicerFile.SupportsGCode ? 0f : 0.1f;
+            fullLayer.LiftHeightTotal = coresLayer2.LiftHeightTotal = SlicerFile.SupportGCode ? 0f : 0.1f;
 
             newLayers[layerIndex * 3] = coresLayer1;
             newLayers[layerIndex * 3 + 1] = coresLayer2;
